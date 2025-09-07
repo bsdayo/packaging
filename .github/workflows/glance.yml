@@ -16,6 +16,11 @@ on:
           - '386'
           - armv7
         default: amd64
+      debian_version:
+        description: Package version
+        required: true
+        type: number
+        default: 1
 
 jobs:
   package:
@@ -52,7 +57,7 @@ jobs:
       - name: Package .deb
         id: package-deb
         run: |
-          deb_version=${GLANCE_TAG#v}
+          deb_version="${GLANCE_TAG#v}-${{ inputs.debian_version }}"
           deb_arch=$(sh deb-arch.sh $GLANCE_ARCH)
           deb_package="glance_${deb_version}_${deb_arch}.deb"
           fpm -s dir -t deb -p $deb_package \

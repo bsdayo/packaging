@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Tag
+        description: Glance release tag
         required: true
       arch:
-        description: Architecture
+        description: Glance architecture
         required: true
         type: choice
         options:

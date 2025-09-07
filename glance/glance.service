@@ -1,0 +1,14 @@
+[Unit]
+Description=Glance - A self-hosted dashboard that puts all your feeds in one place.
+After=network.target
+
+[Service]
+User=root
+Group=root
+EnvironmentFile=/etc/default/glance
+ExecStart=/usr/bin/glance --config /etc/glance/config.yml $EXTRA_OPTS
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,68 @@
+name: Glance
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag
+        required: true
+      arch:
+        description: Architecture
+        required: true
+        default: amd64
+        options:
+          - "386"
+          - amd64
+          - arm64
+          - armv7
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3
+
+      - name: Install fpm
+        run: gem install fpm
+
+      - name: Download Glance tarball
+        run: |
+          curl -fsSL -o ${{ runner.temp }}/glance.tar.gz \
+            "https://github.com/glanceapp/glance/releases/download/${{ inputs.tag }}/glance-linux-${{ inputs.arch }}.tar.gz"
+
+      - name: Extract tarball
+        run: |
+          tar -C ${{ runner.temp }} -xzf ${{ runner.temp }}/glance.tar.gz
+          chmod +x ${{ runner.temp }}/glance
+          mv ${{ runner.temp }}/glance /usr/bin/glance
+
+      - name: Download example config
+        run: |
+          mkdir -p glance/deb/etc/glance
+          example_config_url="https://raw.githubusercontent.com/glanceapp/glance/refs/tags/${ inputs.tag }/docs/glance.yml"
+          echo -e "# Preconfigured page from ${example_config_url}\n" >> glance/deb/etc/glance/glance.yml
+          curl -fsSL $example_config_url >> glance/deb/etc/glance/glance.yml
+
+      - name: Package .deb
+        id: package-deb
+        run: |
+          fpm -s dir -t deb -C glance/deb \
+            --name glance
+            --version ${${{ inputs.tag }}#v}
+            --architecture $(sh deb-arch.sh ${{ inputs.arch }}) \
+            --description "A self-hosted dashboard that puts all your feeds in one place." \
+            --url "https://github.com/glanceapp/glance" \
+            --maintainer "${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>" \
+            --license "AGPL-3.0-or-later" \
+            --deb-systemd glance/glance.service \
+            .
+          echo "deb_filename=$(ls *.deb)" >> $GITHUB_OUTPUT
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.package-deb.outputs.deb_filename }}
+          path: ${{ steps.package-deb.outputs.deb_filename }}

@@ -71,13 +71,14 @@ jobs:
               $RUNNER_TEMP/glance.yml=/etc/glance/glance.yml
           echo "path=$deb_package" >> $GITHUB_OUTPUT
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload to GitHub
+        uses: actions/upload-artifact@v4
         if: ${{ env.GITEA_ACTIONS != 'true' }}
         with:
           name: ${{ steps.package-deb.outputs.path }}
           path: ${{ steps.package-deb.outputs.path }}
 
-      - name: Upload to Gitea if running in Gitea Actions
+      - name: Upload to Gitea
         if: ${{ env.GITEA_ACTIONS == 'true' }}
         env:
           PACKAGES_TOKEN: ${{ secrets.PACKAGES_TOKEN }}

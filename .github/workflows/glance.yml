@@ -20,6 +20,9 @@ on:
 jobs:
   package:
     runs-on: ubuntu-latest
+    env:
+      GLANCE_TAG: ${{ inputs.tag }}
+      GLANCE_ARCH: ${{ inputs.arch }}
     steps:
       - uses: actions/checkout@v5
 
@@ -32,37 +35,40 @@ jobs:
 
       - name: Download Glance tarball
         run: |
-          curl -fsSL -o ${{ runner.temp }}/glance.tar.gz \
-            "https://github.com/glanceapp/glance/releases/download/${{ inputs.tag }}/glance-linux-${{ inputs.arch }}.tar.gz"
+          curl -fsSL -o $RUNNER_TEMP/glance.tar.gz \
+            "https://github.com/glanceapp/glance/releases/download/$GLANCE_TAG/glance-linux-${GLANCE_ARCH}.tar.gz"
 
       - name: Extract tarball
         run: |
-          tar -C ${{ runner.temp }} -xzf ${{ runner.temp }}/glance.tar.gz
-          mkdir -p glance/deb/usr/bin
-          mv ${{ runner.temp }}/glance glance/deb/usr/bin/
-          chmod +x glance/deb/usr/bin/glance
+          tar -C $RUNNER_TEMP -xzf $RUNNER_TEMP/glance.tar.gz
+          mv $RUNNER_TEMP/glance
+          chmod +x $RUNNER_TEMP/glance
 
       - name: Download example config
         run: |
-          mkdir -p glance/deb/etc/glance
-          example_config_url="https://raw.githubusercontent.com/glanceapp/glance/refs/tags/${{ inputs.tag }}/docs/glance.yml"
-          echo -e "# Preconfigured page from ${example_config_url}\n" >> glance/deb/etc/glance/glance.yml
-          curl -fsSL $example_config_url >> glance/deb/etc/glance/glance.yml
+          example_config_url="https://raw.githubusercontent.com/glanceapp/glance/refs/tags/$GLANCE_TAG/docs/glance.yml"
+          echo -e "# Preconfigured page from ${example_config_url}\n" >> $RUNNER_TEMP/glance.yml
+          curl -fsSL $example_config_url >> $RUNNER_TEMP/glance.yml
 
       - name: Package .deb
         id: package-deb
         run: |
-          fpm -s dir -t deb -C glance/deb \
+          fpm -s dir -t deb \
             --name glance
-            --version ${${{ inputs.tag }}#v}
-            --architecture $(sh deb-arch.sh ${{ inputs.arch }}) \
+            --version ${GLANCE_TAG#v}
+            --architecture $(sh deb-arch.sh $GLANCE_ARCH) \
             --description "A self-hosted dashboard that puts all your feeds in one place." \
             --url "https://github.com/glanceapp/glance" \
-            --maintainer "${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>" \
+            --maintainer "${GITHUB_ACTOR} <${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com>" \
             --license "AGPL-3.0-or-later" \
+            --config-files /etc/default/glance \
+            --config-files /etc/glance/glance.yml \
             --deb-systemd glance/glance.service \
-            .
-          echo "deb_filename=$(ls *.deb)" >> $GITHUB_OUTPUT
+              $RUNNER_TEMP/glance=/usr/bin/glance \
+              glance/glance.env=/etc/default/glance \
+              $RUNNER_TEMP/glance.yml=/etc/glance/glance.yml
+
+          echo "deb_filename=$(find *.deb)" >> $GITHUB_OUTPUT
 
       - uses: actions/upload-artifact@v4
         with:

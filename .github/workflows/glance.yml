@@ -9,12 +9,13 @@ on:
       arch:
         description: Architecture
         required: true
-        default: amd64
+        type: choice
         options:
-          - "386"
           - amd64
           - arm64
+          - '386'
           - armv7
+        default: amd64
 
 jobs:
   package:

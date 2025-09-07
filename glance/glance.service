@@ -6,7 +6,7 @@ After=network.target
 User=root
 Group=root
 EnvironmentFile=/etc/default/glance
-ExecStart=/usr/bin/glance --config /etc/glance/config.yml $EXTRA_OPTS
+ExecStart=/usr/bin/glance --config /etc/glance/glance.yml $EXTRA_OPTS
 Restart=on-failure
 RestartSec=5s
 

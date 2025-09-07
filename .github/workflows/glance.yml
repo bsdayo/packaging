@@ -53,8 +53,8 @@ jobs:
         id: package-deb
         run: |
           fpm -s dir -t deb \
-            --name glance
-            --version ${GLANCE_TAG#v}
+            --name glance \
+            --version ${GLANCE_TAG#v} \
             --architecture $(sh deb-arch.sh $GLANCE_ARCH) \
             --description "A self-hosted dashboard that puts all your feeds in one place." \
             --url "https://github.com/glanceapp/glance" \

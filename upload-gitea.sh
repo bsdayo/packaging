@@ -12,9 +12,9 @@ fi
 extension=${1##*.}
 case "${extension}" in
 deb)
-    url="${GITEA_SERVER_URL}/api/packages/${GITEA_ACTOR}/debian/pool/stable/main/upload"
+    url="${GITHUB_SERVER_URL}/api/packages/${GITHUB_ACTOR}/debian/pool/stable/main/upload"
     echo "Uploading to ${url}"
-    curl -fsSL -u "${GITEA_ACTOR}:${PACKAGES_TOKEN}" -T $1 $url
+    curl -fsSL -u "${GITHUB_ACTOR}:${PACKAGES_TOKEN}" -T $1 $url
     ;;
 *)
     echo "Unsupported package type: ${extension}, skipping upload"

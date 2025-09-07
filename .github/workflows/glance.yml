@@ -41,7 +41,6 @@ jobs:
       - name: Extract tarball
         run: |
           tar -C $RUNNER_TEMP -xzf $RUNNER_TEMP/glance.tar.gz
-          mv $RUNNER_TEMP/glance
           chmod +x $RUNNER_TEMP/glance
 
       - name: Download example config

@@ -4,11 +4,6 @@
 
 set -e
 
-if [ -z $GITEA_ACTIONS ]; then
-    echo "Not running in Gitea Actions, skipping upload"
-    exit 0
-fi
-
 extension=${1##*.}
 case "${extension}" in
 deb)

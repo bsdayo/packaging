@@ -2,7 +2,9 @@
 
 # Usage: upload-gitea.sh <package.deb>
 
-if [[ -n $GITEA_ACTIONS ]]; then
+set -e
+
+if [ -n $GITEA_ACTIONS ]; then
     echo "Not running in Gitea Actions, skipping upload"
     exit 0
 fi

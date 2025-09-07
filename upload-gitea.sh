@@ -12,9 +12,9 @@ fi
 extension=${1##*.}
 case "${extension}" in
 deb)
-    echo "Uploading deb package to Gitea"
-    curl -fsSL -u "${GITEA_ACTOR}:${PACKAGES_TOKEN}" -T *.deb \
-        "${GITEA_SERVER_URL}/api/packages/${GITEA_ACTOR}/debian/pool/stable/main/upload"
+    url="${GITEA_SERVER_URL}/api/packages/${GITEA_ACTOR}/debian/pool/stable/main/upload"
+    echo "Uploading to ${url}"
+    curl -fsSL -u "${GITEA_ACTOR}:${PACKAGES_TOKEN}" -T $1 $url
     ;;
 *)
     echo "Unsupported package type: ${extension}, skipping upload"

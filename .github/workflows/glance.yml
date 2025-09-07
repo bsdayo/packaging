@@ -38,8 +38,9 @@ jobs:
       - name: Extract tarball
         run: |
           tar -C ${{ runner.temp }} -xzf ${{ runner.temp }}/glance.tar.gz
-          chmod +x ${{ runner.temp }}/glance
-          mv ${{ runner.temp }}/glance /usr/bin/glance
+          mkdir -p glance/deb/usr/bin
+          mv ${{ runner.temp }}/glance glance/deb/usr/bin/
+          chmod +x glance/deb/usr/bin/glance
 
       - name: Download example config
         run: |

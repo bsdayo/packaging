@@ -17,7 +17,7 @@ on:
           - armv7
         default: amd64
       debian_version:
-        description: Package version
+        description: Package Debian version
         required: true
         type: number
         default: 1

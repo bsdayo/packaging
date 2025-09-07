@@ -45,7 +45,7 @@ jobs:
       - name: Download example config
         run: |
           mkdir -p glance/deb/etc/glance
-          example_config_url="https://raw.githubusercontent.com/glanceapp/glance/refs/tags/${ inputs.tag }/docs/glance.yml"
+          example_config_url="https://raw.githubusercontent.com/glanceapp/glance/refs/tags/${{ inputs.tag }}/docs/glance.yml"
           echo -e "# Preconfigured page from ${example_config_url}\n" >> glance/deb/etc/glance/glance.yml
           curl -fsSL $example_config_url >> glance/deb/etc/glance/glance.yml
 
